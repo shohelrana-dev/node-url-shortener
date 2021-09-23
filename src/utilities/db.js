@@ -29,6 +29,8 @@ const Direction = db.define('directions', {
     hash: Sequelize.TEXT
 });
 
+User.hasOne(Direction);
+
 db.sync()
     .then(e => console.log('Database synced'))
     .catch(e => console.log(e.message));
