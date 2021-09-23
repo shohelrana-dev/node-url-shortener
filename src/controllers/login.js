@@ -5,7 +5,6 @@ const { body, validationResult } = require('express-validator');
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const { app_secret } = require('../config.json');
-const errorHandler = require('../middlewares/error_handler');
 
 const loginValidator = [
     body('email').isEmail().withMessage('Please provide your email.'),
