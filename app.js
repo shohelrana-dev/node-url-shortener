@@ -5,6 +5,7 @@ const signup = require('./src/controllers/signup');
 const login = require('./src/controllers/login');
 const auth = require('./src/middlewares/auth');
 const redirects = require('./src/controllers/redirects');
+const path = require('path')
 
 //app instance
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use('/api', auth);
+app.use(express.static(path.resolve('./frontend/build')));
 
 //routes
 app.use(signup);
