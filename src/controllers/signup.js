@@ -1,9 +1,8 @@
 //dependencies
+const router = require('express').Router();
+const { body, validationResult } = require('express-validator');
 const { User } = require('../utilities/db');
 const { generate } = require('../utilities/passwords');
-const { body, validationResult } = require('express-validator');
-const express = require('express');
-const router = express.Router();
 
 const signupValidator = [
     body('name').isLength({ min: 1 }).withMessage('Please provide your name.'),
@@ -25,8 +24,14 @@ router.post('/signup', signupValidator, (req, res, next) => {
     let { name, email } = req.body;
 
     User.create({ name, email, password })
-        .then(data => res.status(200).json({ error: false, message: 'User created' }))
-        .catch(err => res.status(400).json({ error: true, message: err.message }));
+        .then(data => res.status(200).json({
+            error: false,
+            message: 'User created'
+        }))
+        .catch(err => res.status(400).json({
+            error: true,
+            message: err.message
+        }));
 });
 
 module.exports = router;

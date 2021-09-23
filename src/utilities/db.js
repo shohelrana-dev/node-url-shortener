@@ -25,8 +25,8 @@ const User = db.define('users', {
 });
 
 const Direction = db.define('directions', {
-    destination: Sequelize.TEXT,
-    hash: Sequelize.TEXT
+    destination: Sequelize.STRING,
+    hash: Sequelize.STRING
 });
 
 User.hasOne(Direction);

@@ -13,14 +13,12 @@ const app = express();
 app.use(cors);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use('/api', auth);
+
+//routes
 app.use(signup);
 app.use(login);
-app.use('/api', auth);
 app.use(redirects);
-
-app.get('/', (req, res) => {
-    res.end('Hello world');
-});
 
 const _port = process.env.PORT || 4000;
 app.listen(_port, () => {
