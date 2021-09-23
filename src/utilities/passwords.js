@@ -16,7 +16,7 @@ function generate(password) {
     return { hash, salt };
 }
 
-function validate(password, hash, salt) {
+function validate(password, salt, hash) {
     let newHash = mix(password, salt);
     return hash === newHash;
 }

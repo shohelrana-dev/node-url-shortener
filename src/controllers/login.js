@@ -1,9 +1,11 @@
 //dependencies
 const { User } = require('../utilities/db');
-const { generate } = require('../utilities/passwords');
+const { validate } = require('../utilities/passwords');
 const { body, validationResult } = require('express-validator');
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
+const jwt = require('jsonwebtoken');
+const { app_secret } = require('../config.json');
+const errorHandler = require('../middlewares/error_handler');
 
 const loginValidator = [
     body('email').isEmail().withMessage('Please provide your email.'),
@@ -17,18 +19,23 @@ router.post('/login', loginValidator, (req, res, next) => {
         return res.status(422).json({ errors: errors.array() });
     }
 
-    // let chunks = generate(req.body.password);
-    // let password = `${chunks.salt}.${chunks.hash}`;
-
     let { email, password } = req.body;
 
-    User.findOne({ email })
-        .then(data => {
-            res.status(200).json({ error: false, message: 'User found', data: data })
+    User.findOne({ where: { email } })
+        .then(user => {
+            if (!user) {
+                return res.status(201).json({ error: true, message: 'User not found' });
+            }
+
+            let { id, name, email } = user;
+            let [salt, hash] = user.password.split('.');
+            let valid = validate(password, salt, hash);
+            if (valid) {
+                let token = jwt.sign({ id, name, email }, app_secret);
+                return res.status(200).json({ token, error: false, user: { id, name, email } });
+            }
+            return res.status(201).json({ error: true, message: 'Password incorrect' })
         })
-        .catch(err => {
-            res.status(400).json({ error: true, message: err.message })
-        });
 });
 
 module.exports = router;
