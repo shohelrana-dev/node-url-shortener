@@ -5,6 +5,14 @@ body {
     font-family: 'Poppins', sans-serif !important;
 }
 
+a {
+    text-decoration: none;
+}
+
+.MuiAppBar-root button.MuiButton-root {
+    margin-right: 5px;
+}
+
 .container {
     max-width: 1080px;
     margin: auto;
@@ -12,4 +20,27 @@ body {
 
 .text-center {
     text-align: center;
+}
+
+p.error {
+    margin-bottom: 0;
+    color: red;
+    font-size: 12px;
+    font-style: italic;
+}
+
+p.block-error {
+    background: #d9534f;
+    color: #fff;
+    padding: 10px 15px;
+}
+
+p.success {
+    background: #5cb85c;
+    color: #fff;
+    padding: 10px 15px;
+}
+
+.form__field {
+    margin-bottom: 15px;
 }

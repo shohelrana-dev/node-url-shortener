@@ -1,24 +1,27 @@
 import React from 'react';
-import { Menu } from 'antd';
 import { Link } from '@reach/router';
+import { AppBar, Box, Container, Toolbar, Typography, Button } from '@mui/material';
 
 const Header = () => {
     return (
-        <header>
-            <div className="container">
-                <Menu mode="horizontal">
-                    <Menu.Item key="home">
-                        <Link to="/">Home</Link>
-                    </Menu.Item>
-                    <Menu.Item key="login">
+        <AppBar position="static" color="transparent">
+            <Container>
+                <Toolbar>
+                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                        URL Shortener App
+                    </Typography>
+                    <Button variant="outlined">
+                        <Link to="/" >Home</Link>
+                    </Button>
+                    <Button variant="outlined">
                         <Link to="/login">Login</Link>
-                    </Menu.Item>
-                    <Menu.Item key="signup">
+                    </Button>
+                    <Button variant="outlined">
                         <Link to="/signup">Signup</Link>
-                    </Menu.Item>
-                </Menu>
-            </div>
-        </header>
+                    </Button>
+                </Toolbar>
+            </Container>
+        </AppBar>
     );
 };
 

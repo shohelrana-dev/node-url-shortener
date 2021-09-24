@@ -1,6 +1,5 @@
 import React from 'react';
 import './assets/css/global.css';
-import 'antd/dist/antd.css';
 import { Router } from '@reach/router';
 import Header from './components/Global/Header';
 import Home from './components/Home';
