@@ -29,18 +29,19 @@ p.error {
     font-style: italic;
 }
 
-p.block-error {
-    background: #d9534f;
-    color: #fff;
-    padding: 10px 15px;
+.MuiAlert-root {
+    margin-bottom: 18px;
 }
 
-p.success {
-    background: #5cb85c;
-    color: #fff;
-    padding: 10px 15px;
+.form {
+    background: #cccccc2e;
+    padding: 25px;
 }
 
 .form__field {
     margin-bottom: 15px;
+}
+
+button a {
+    display: block !important;
 }

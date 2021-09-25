@@ -15,7 +15,7 @@ router.post('/login', loginValidator, (req, res, next) => {
     const errors = (validationResult(req));
 
     if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
+        return res.status(422).json({ errors: errors.mapped() });
     }
 
     let { email, password } = req.body;
@@ -23,7 +23,7 @@ router.post('/login', loginValidator, (req, res, next) => {
     User.findOne({ where: { email } })
         .then(user => {
             if (!user) {
-                return res.status(201).json({ error: true, message: 'User not found' });
+                return res.status(422).json({ error: true, message: 'User not found' });
             }
 
             let { id, name, email } = user;
@@ -33,7 +33,7 @@ router.post('/login', loginValidator, (req, res, next) => {
                 let token = jwt.sign({ id, name, email }, app_secret);
                 return res.status(200).json({ token, error: false, user: { id, name, email } });
             }
-            return res.status(201).json({ error: true, message: 'Password incorrect' })
+            return res.status(422).json({ error: true, message: 'Password incorrect' })
         })
 });
 

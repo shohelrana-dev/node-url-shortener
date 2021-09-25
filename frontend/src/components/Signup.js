@@ -1,63 +1,56 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import apiEndpoints from '../api-endpoints';
-import { TextField, Button } from '@mui/material';
+import { TextField, Button, Alert } from '@mui/material';
+import { useAuth } from '../contexts/AuthContext';
 
 const Signup = () => {
-    const [successMsg, setSuccessMsg] = useState(false);
     const [errors, setErrors] = useState({});
-    const [errorMsg, setErrorMsg] = useState();
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [successMsg, setSuccessMsg] = useState(null);
 
-    const submitForm = (e) => {
+    const { signup } = useAuth();
+
+    async function submitForm(e) {
         e.preventDefault();
         let name = e.target.name.value;
         let email = e.target.email.value;
         let password = e.target.password.value;
 
-        axios.post(apiEndpoints.signup, { name, email, password })
-            .then(res => {
-                e.target.name.value = '';
-                e.target.email.value = '';
-                e.target.password.value = '';
-                setSuccessMsg(res.data?.message);
-                setErrors({});
-            })
-            .catch(err => {
-                let _errors = err?.response?.data?.errors;
-                let errMsg = err?.response?.data.message;
-                let newErrors = {};
-                _errors && _errors.forEach((err, i) => {
-                    newErrors = { ...newErrors, [err.param]: err.msg };
-                });
-                setSuccessMsg(false);
-                setErrors(newErrors);
-                if (errMsg) {
-                    setErrorMsg(err?.response?.data.message)
-                }
-            });
+        let { errors, errorMsg, successMsg } = await signup(name, email, password);
+        console.log(errors, errorMsg, successMsg);
+        if (successMsg !== null) {
+            e.target.name.value = '';
+            e.target.email.value = '';
+            e.target.password.value = '';
+            setSuccessMsg(successMsg);
+            setErrorMsg(null);
+            setErrors({});
+        } else {
+            setSuccessMsg(null);
+            setErrorMsg(errorMsg);
+            setErrors(errors);
+        }
     }
+
+    let { name, email, password } = errors;
 
     return (
         <div className="container">
             <div style={{ maxWidth: '350px', margin: 'auto', paddingTop: '60px' }}>
                 <h1 className="text-center">Signup</h1>
-                <form
-                    onSubmit={submitForm}
-                    style={{ background: '#cccccc2e', padding: '25px' }}
-                >
-                    {successMsg && <p className="success">{successMsg}</p>}
-                    {errorMsg && <p className="block-error">{errorMsg}</p>}
+                <form onSubmit={submitForm} className="form">
+                    {successMsg && <Alert severity="success" variant="filled">{successMsg}</Alert>}
+                    {errorMsg && <Alert severity="error" variant="filled">{errorMsg}</Alert>}
                     <div className="form__field">
                         <TextField label="Name" variant="outlined" type="text" name="name" fullWidth />
-                        {errors.name && <p className="error">{errors.name}</p>}
+                        {name && <p className="error">{name.msg}</p>}
                     </div>
                     <div className="form__field">
                         <TextField fullWidth label="Email" variant="outlined" type="text" name="email" />
-                        {errors.email && <p className="error">{errors.email}</p>}
+                        {email && <p className="error">{email.msg}</p>}
                     </div>
                     <div className="form__field">
                         <TextField fullWidth label="Password" variant="outlined" type="text" name="password" />
-                        {errors.password && <p className="error">{errors.password}</p>}
+                        {password && <p className="error">{password.msg}</p>}
                     </div>
                     <Button variant="contained" type="submit" fullWidth>Signup</Button>
                 </form>

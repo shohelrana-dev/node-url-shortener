@@ -8,7 +8,7 @@ let entryValidator = body('url').isURL().withMessage('Please Provide valid URL')
 router.post('/api/v1/redirects', entryValidator, (req, res, next) => {
     let errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json(errors.array());
+        return res.status(400).json({ errors: errors.mapped() });
     }
 
     let userId = req.user.id;

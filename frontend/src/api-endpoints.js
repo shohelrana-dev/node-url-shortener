@@ -1,6 +1,8 @@
+
 const apiEndpoints = {
-    signup: 'http://localhost:4000/signup',
-    login: 'http://localhost:4000/login',
-    redirects: 'http://localhost:4000/api/v1/redirects',
+    signup: `${process.env.REACT_APP_HOME_URL}/signup`,
+    login: `${process.env.REACT_APP_HOME_URL}/login`,
+    redirects: `${process.env.REACT_APP_HOME_URL}/api/v1/redirects`,
 };
+
 export default apiEndpoints;
