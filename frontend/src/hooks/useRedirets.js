@@ -36,16 +36,20 @@ function useRedirects() {
             method: 'post',
             data: { url },
             headers: { "auth-token": authToken }
-        }))
+        }));
         if (resData && !resError) {
             fetchRedirects();
-            return { successMsg: resData?.data?.message || null };
-        } else {
-            return { errorMsg: resError?.response?.data?.errors?.url?.msg || null };
         }
+        let errors = resError?.response?.data?.errors || {};
+        let success = resData?.data?.success || null;
+        let successMsg = resData?.data?.message || null;
+        let direction = resData?.data?.direction || {};
+
+        return { errors, success, successMsg, direction };
     }
 
     return { loading, error, redirects, addRedirect };
+
 }
 
 export default useRedirects;

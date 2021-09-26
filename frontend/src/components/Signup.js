@@ -4,7 +4,6 @@ import { useAuth } from '../contexts/AuthContext';
 
 const Signup = () => {
     const [errors, setErrors] = useState({});
-    const [errorMsg, setErrorMsg] = useState(null);
     const [successMsg, setSuccessMsg] = useState(null);
 
     const { signup } = useAuth();
@@ -15,23 +14,21 @@ const Signup = () => {
         let email = e.target.email.value;
         let password = e.target.password.value;
 
-        let { errors, errorMsg, successMsg } = await signup(name, email, password);
-        console.log(errors, errorMsg, successMsg);
-        if (successMsg !== null) {
+        let { errors, success, successMsg } = await signup(name, email, password);
+
+        if (success) {
             e.target.name.value = '';
             e.target.email.value = '';
             e.target.password.value = '';
             setSuccessMsg(successMsg);
-            setErrorMsg(null);
             setErrors({});
         } else {
             setSuccessMsg(null);
-            setErrorMsg(errorMsg);
             setErrors(errors);
         }
     }
 
-    let { name, email, password } = errors;
+    let { name, email, password, common } = errors;
 
     return (
         <div className="container">
@@ -39,7 +36,7 @@ const Signup = () => {
                 <h1 className="text-center">Signup</h1>
                 <form onSubmit={submitForm} className="form">
                     {successMsg && <Alert severity="success" variant="filled">{successMsg}</Alert>}
-                    {errorMsg && <Alert severity="error" variant="filled">{errorMsg}</Alert>}
+                    {common?.msg && <Alert severity="error" variant="filled">{common.msg}</Alert>}
                     <div className="form__field">
                         <TextField label="Name" variant="outlined" type="text" name="name" fullWidth />
                         {name && <p className="error">{name.msg}</p>}

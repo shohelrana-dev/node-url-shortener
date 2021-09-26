@@ -2,10 +2,11 @@
 const router = require('express').Router();
 const { body, validationResult } = require('express-validator');
 const { Direction } = require('../utilities/db');
+const _pr = require('../utilities/promiseResolver');
 
 let entryValidator = body('url').isURL().withMessage('Please Provide valid URL');
 
-router.post('/api/v1/redirects', entryValidator, (req, res, next) => {
+router.post('/api/v1/redirects', entryValidator, async (req, res) => {
     let errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.mapped() });
@@ -17,25 +18,39 @@ router.post('/api/v1/redirects', entryValidator, (req, res, next) => {
 
     let hash = parseInt(`${userId}${timestamp}`).toString(32);
 
-    Direction.create({ userId, destination, hash })
-        .then(data => res.status(200).json({
-            error: false,
-            message: 'Direction created',
-            hash
-        }))
-        .catch(err => res.status(400).json({
-            error: true,
-            message: err.message
-        }));
+    const [error, _direction] = await _pr(Direction.create({ userId, destination, hash }));
+    console.log(_direction);
+    if (error) {
+        return res.status(400).json({ errors: { common: error.message } });
+    }
+    return res.status(201).json({
+        success: true,
+        direction: _direction.dataValues,
+        message: 'Direction created successfully', hash
+    });
 });
 
-router.get('/api/v1/redirects', entryValidator, (req, res) => {
-    Direction.findAll({
-        where: { userId: req.user.id },
-        limit: 10
-    }).then(directions => {
-        res.status(200).json(directions);
-    })
+router.get('/api/v1/redirects', async (req, res) => {
+    const [error, redirects] = await _pr(Direction.findAll({ where: { userId: req.user.id } }));
+    return res.status(200).json(redirects);
+});
+
+router.get('/:hash', async (req, res, next) => {
+    let urlHash = req.params.hash;
+    let [error, hashDirection] = await _pr(Direction.findOne({
+        where: {
+            'hash': urlHash
+        }
+    }));
+    if (error) {
+        return res.status(400).json({ message: error.message });
+    }
+    if (hashDirection) {
+        return res.redirect(301, hashDirection.dataValues.destination);
+    }
+    else {
+        next();
+    }
 });
 
 module.exports = router;

@@ -5,13 +5,15 @@ const { body, validationResult } = require('express-validator');
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const { app_secret } = require('../config.json');
+const _pr = require('../utilities/promiseResolver');
 
 const loginValidator = [
-    body('email').isEmail().withMessage('Please provide your email.'),
-    body('password').isLength({ min: 1 }).withMessage('Please provide your password.'),
+    body('email').isLength({ min: 1 }).withMessage('Email address is required.')
+        .isEmail().withMessage('Please provide your email.').trim(),
+    body('password').isLength({ min: 1 }).withMessage('Password is required.').trim(),
 ];
 
-router.post('/login', loginValidator, (req, res, next) => {
+router.post('/login', loginValidator, async (req, res) => {
     const errors = (validationResult(req));
 
     if (!errors.isEmpty()) {
@@ -20,21 +22,23 @@ router.post('/login', loginValidator, (req, res, next) => {
 
     let { email, password } = req.body;
 
-    User.findOne({ where: { email } })
-        .then(user => {
-            if (!user) {
-                return res.status(422).json({ error: true, message: 'User not found' });
-            }
+    const [error, user] = await _pr(User.findOne({ where: { email } }));
+    if (error || !user) {
+        return res.status(401).json({ errors: { common: { msg: 'User not found' } } });
+    }
 
-            let { id, name, email } = user;
-            let [salt, hash] = user.password.split('.');
-            let valid = validate(password, salt, hash);
-            if (valid) {
-                let token = jwt.sign({ id, name, email }, app_secret);
-                return res.status(200).json({ token, error: false, user: { id, name, email } });
-            }
-            return res.status(422).json({ error: true, message: 'Password incorrect' })
-        })
+    let userInfo = {
+        id: user.id,
+        name: user.name,
+        email: user.email
+    };
+    let [salt, hash] = user.password.split('.');
+    let valid = validate(password, salt, hash);
+    if (valid) {
+        let token = jwt.sign(userInfo, app_secret);
+        return res.status(200).json({ token, success: true, user: userInfo });
+    }
+    return res.status(401).json({ errors: { common: { msg: 'Password incorrect' } } });
 });
 
 module.exports = router;

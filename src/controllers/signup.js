@@ -3,6 +3,7 @@ const router = require('express').Router();
 const { body, validationResult } = require('express-validator');
 const { User } = require('../utilities/db');
 const { generate } = require('../utilities/passwords');
+const _pr = require('../utilities/promiseResolver');
 
 const signupValidator = [
     body('name').isLength({ min: 1 }).withMessage('Please provide your name.'),
@@ -11,7 +12,7 @@ const signupValidator = [
     body('password').isLength({ max: 20 }).withMessage('The password should be max 20 character')
 ];
 
-router.post('/signup', signupValidator, (req, res, next) => {
+router.post('/signup', signupValidator, async (req, res) => {
     const errors = (validationResult(req));
 
     if (!errors.isEmpty()) {
@@ -23,15 +24,12 @@ router.post('/signup', signupValidator, (req, res, next) => {
 
     let { name, email } = req.body;
 
-    User.create({ name, email, password })
-        .then(data => res.status(201).json({
-            error: false,
-            message: 'User created'
-        }))
-        .catch(err => res.status(422).json({
-            error: true,
-            message: err.message
-        }));
+    const [error, user] = await _pr(User.create({ name, email, password }));
+
+    if (error) {
+        return res.status(424).json({ errors: { common: { msg: 'The email address already exists' } } });
+    }
+    return res.status(201).json({ success: true, message: 'User signup successfully' });
 });
 
 module.exports = router;

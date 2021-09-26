@@ -1,35 +1,33 @@
 import React, { useState } from 'react';
 import { TextField, Button, Alert } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
-import { usePopMsg } from '../contexts/PopMsgContext';
+import { useAlert } from 'react-alert';
 
 const Login = () => {
     const [errors, setErrors] = useState({});
-    const [errorMsg, setErrorMsg] = useState(null);
 
     const { login } = useAuth();
-    const { setPopMsg } = usePopMsg();
+    const alert = useAlert();
 
     async function submitForm(e) {
         e.preventDefault();
         let email = e.target.email.value;
         let password = e.target.password.value;
 
-        let { errors, errorMsg } = await login(email, password);
-        setErrors(errors);
-        setErrorMsg(errorMsg);
-        if (errorMsg) {
-            setPopMsg(errorMsg);
+        let { errors } = await login(email, password);
+        if (errors?.common?.msg) {
+            alert.error('Login failed', { position: 'top right' });
         }
+        setErrors(errors);
     }
 
-    let { email, password } = errors;
+    let { email, password, common } = errors;
     return (
         <div className="container">
             <div style={{ maxWidth: '350px', margin: 'auto', paddingTop: '60px' }}>
                 <h1 className="text-center">Login</h1>
                 <form onSubmit={submitForm} className="form">
-                    {errorMsg && <Alert severity="error" variant="filled">{errorMsg}</Alert>}
+                    {common?.msg && <Alert severity="error" variant="filled">{common.msg}</Alert>}
                     <div className="form__field">
                         <TextField fullWidth label="Email" variant="outlined" type="text" name="email" />
                         {email && <p className="error">{email.msg}</p>}

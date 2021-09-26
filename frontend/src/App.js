@@ -8,13 +8,22 @@ import Signup from './components/Signup';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/AuthRoutes/ProtectedRoute';
 import PublicRoute from './components/AuthRoutes/PublicRoute';
-import { PopMsgProvider } from './contexts/PopMsgContext';
+import { Provider as AlertProvider } from 'react-alert';
+import AlertTemplate from 'react-alert-template-basic'
 
 function App() {
 
+  // Alert configuration
+  const AlertOptions = {
+    position: 'top right',
+    timeout: 3000,
+    offset: '30px',
+    transition: 'scale'
+  }
+
   return (
-    <AuthProvider>
-      <PopMsgProvider>
+    <AlertProvider template={AlertTemplate} {...AlertOptions}>
+      <AuthProvider>
         <div className="app">
           <Header />
           <Router>
@@ -23,8 +32,8 @@ function App() {
             <PublicRoute as={Signup} path="/signup" />
           </Router>
         </div>
-      </PopMsgProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </AlertProvider>
   );
 }
 

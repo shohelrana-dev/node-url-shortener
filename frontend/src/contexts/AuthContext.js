@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import axios from 'axios';
 import apiEndpoints from "../api-endpoints";
 import _pr from "../promiseResolver";
+import { useAlert } from 'react-alert';
 
 const AuthContext = React.createContext();
 
@@ -14,37 +15,40 @@ export function AuthProvider({ children }) {
     const [authToken, setAuthToken] = useState(localStorage.getItem('auth-token'));
     const [currentUser, setCurrentUser] = useState();
 
+    const alert = useAlert();
+
 
     // signup function
     async function signup(name, email, password) {
         const [resError, resData] = await _pr(axios.post(apiEndpoints.signup, { name, email, password }));
         let errors = resError?.response?.data?.errors || {};
-        let errorMsg = resError?.response?.data?.message || null;
+        let success = resData?.data?.success || false;
         let successMsg = resData?.data?.message || null;
 
-        return { errors, errorMsg, successMsg };
+        return { errors, success, successMsg };
     }
 
     // login function
     async function login(email, password) {
         const [resError, resData] = await _pr(axios.post(apiEndpoints.login, { email, password }));
         let errors = resError?.response?.data?.errors || {};
-        let errorMsg = resError?.response?.data?.message || null;
 
         if (resData && !resError && !resData.data.error && resData.data.token) {
             localStorage.setItem('auth-token', resData.data.token);
             setAuthToken(resData.data.token);
             setIsLoggedIn(true);
             setCurrentUser(resData.data.user);
+            alert.success('Login successfully', { position: 'top right' });
         }
 
-        return { errors, errorMsg };
+        return { errors, userData: resData?.data };
     }
 
     // logout function
     function logout() {
         localStorage.removeItem('auth-token');
         setIsLoggedIn(false);
+        alert.success('You has been logout.', { position: 'top right' });
     }
 
     const value = {
