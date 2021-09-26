@@ -1,9 +1,15 @@
 //dependencies
 const Sequelize = require('sequelize');
 
-const db = new Sequelize('nodejs_urls', 'root', 'password', {
-    host: 'localhost',
-    dialect: 'mysql',
+let database = process.env.DB_DATABASE;
+let user = process.env.DB_USER;
+let password = process.env.DB_PASSWORD;
+let host = process.env.DB_HOST;
+let connection = process.env.DB_CONNECTION;
+
+const db = new Sequelize(database, user, password, {
+    host: host,
+    dialect: connection,
     pool: {
         max: 5,
         min: 0,

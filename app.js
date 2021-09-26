@@ -1,4 +1,5 @@
 //dependencies
+require('dotenv').config()
 const express = require("express");
 const cors = require('./src/middlewares/cors');
 const signup = require('./src/controllers/signup');
@@ -24,7 +25,7 @@ app.use(login);
 app.use(redirects);
 
 //run the server
-const _port = process.env.PORT || 4000;
+const _port = process.env.APP_PORT || 4000;
 app.listen(_port, () => {
     console.log(`Application listening on port ${_port}`);
 });
