@@ -19,7 +19,6 @@ router.post('/api/v1/redirects', entryValidator, async (req, res) => {
     let hash = parseInt(`${userId}${timestamp}`).toString(32);
 
     const [error, _direction] = await _pr(Direction.create({ userId, destination, hash }));
-    console.log(_direction);
     if (error) {
         return res.status(400).json({ errors: { common: error.message } });
     }
